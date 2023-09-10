@@ -29,11 +29,8 @@ drop_table() {
 insert_into_table() {
 
 }
-
-# Prompts the user for a table name and then displays its content in a formatted manner.
-# Extracts the column names from the table file and then prints each row.
-select_from_table() {
-
+alter_table() {
+    # menu (insert/update/delete/back)
 }
 
 # Asks the user to enter the primary key of the row that he wants to delete

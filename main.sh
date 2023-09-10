@@ -3,18 +3,30 @@
 source database_operations.sh
 
 main_menu() {
-  
-  # view welcome text to the user
- 
-  # view list to choose from (create database - list databases - connect to database - drop database)
-  
-  # if the user choose (create database) => create_database() ( database_operations.sh )
-  
-  # if the user choose (list databases) => list_databases() ( database_operations.sh )
-  
-  # if the user choose (connect to database) => connect_to_database() ( database_operations.sh )
-  
-  # if the user choose (rop database) => drop_database() ( database_operations.sh )
-  
+  while true; do
+    printf "\n%s\n" " ------------------------- "
+    printf "| %-22s  |\n" "Main Menu"
+    printf "| %-22s  |\n" "1. Create Database"
+    printf "| %-22s  |\n" "2. List Databases"
+    printf "| %-22s  |\n" "3. Connect To Database"
+    printf "| %-22s  |\n" "4. Drop Database"
+    printf "| %-22s  |\n" "5. Exit"
+    printf "%s\n" " ------------------------- "
+
+    read -p "| Enter your choice: " choice
+
+    printf "%s\n\n" " -------------------------"
+
+
+    case $choice in
+      1) create_database ;;
+      2) list_databases ;;
+      3) connect_to_database ;;
+      4) drop_database ;;
+      5) exit 0 ;;
+      *) echo "Invalid choice" ;;
+    esac
+  done
 }
 
+main_menu
