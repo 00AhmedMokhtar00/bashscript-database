@@ -1,32 +1,4 @@
-#!/bin/bash
 
-
-# Prompts the user to enter a table name, columns, and a primary key column.
-
-# Creates a new .tbl file for the table with the provided name
-# and saves the primary key and columns into the file.
-create_table() {
-
-}
-
-# Lists all available .tbl files, which represent the tables in the database.
-list_tables() {
-
-}
-
-# Prompts the user for a table name.
-# Check first:
-#   - if the table exists drop and show success message.
-#   - if the table doesn't exists show information message.
-# In both cases we should go back to the tables menu
-drop_table() {
-
-}
-
-
-alter_table() {
-    # menu (insert/update/delete/back)
-}
 
 
 # Prompts the user for a table name and values for its columns.
@@ -35,8 +7,11 @@ alter_table() {
 insert_into_table() {
 
 }
-alter_table() {
-    # menu (insert/update/delete/back)
+
+# Prompts the user for a table name and then displays its content in a formatted manner.
+# Extracts the column names from the table file and then prints each row.
+select_from_table() {
+
 }
 
 # Asks the user to enter the primary key of the row that he wants to delete
