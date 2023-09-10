@@ -24,7 +24,7 @@ main_menu() {
       3) connect_to_database ;;
       4) drop_database ;;
       5) exit 0 ;;
-      *) echo "Invalid choice" ;;
+      *) echo "Invalid choice try again!" ;;
     esac
   done
 }
