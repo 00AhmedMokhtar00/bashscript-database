@@ -27,14 +27,3 @@ alter_table() {
     # menu (insert/update/delete/back)
 }
 
-
-# Prompts the user for a table name and values for its columns.
-# Inserts the values into the table.
-# Also checks for the table's existence before proceeding.
-insert_into_table() {
-
-}
-alter_table() {
-    # menu (insert/update/delete/back)
-}
-

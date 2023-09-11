@@ -1,4 +1,4 @@
-Tasks for Day 1:
+Tasks for Phase 1:
 
 Alaa:
     - Document  (main.sh - database_operations.sh - table_operations.sh)
@@ -7,3 +7,12 @@ Alaa:
 Mokhtar:
     - Document  (record_operations.sh)
     - Implement (main_menu - create_database - list_databases)
+
+Tasks for Phase 2 (Implementation for table operations):
+
+Mokhtar:
+    - Create Table
+    - List Tables
+Alaa:
+    - Drop Table
+    - Alter Table
