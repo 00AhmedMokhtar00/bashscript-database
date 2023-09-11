@@ -1,7 +1,6 @@
 #!/bin/bash
 
 source table_operations.sh
-source table_manipulation.sh
 
 # Prompts the user for a table name and values for its columns.
 # Inserts the values into the table.

@@ -10,7 +10,7 @@ create_database() {
   # if yes => view "Database already exists"
   if is_valid_name "$dbname" "database"; then
     mkdir -p $dbname
-    important_info_message "Database ($dbname) created successfully."
+    important_info_message "Database ($dbname) created successfully." "success"
   fi
 }
 
@@ -51,7 +51,7 @@ connect_to_database() {
   clear
   if [ -d "$dbname" ]; then
     cd ./$dbname
-    important_info_message "Connected to database ($dbname)."
+    important_info_message "Connected to database ($dbname)." "success"
     table_menu
     return
 
@@ -82,7 +82,7 @@ drop_database() {
 
   case $choice in
     1) rm -r $dbname
-        important_info_message "Database ($dbname) dropped successfully.";;
+        important_info_message "Database ($dbname) dropped successfully." "success";;
     2) return ;;
     *) error_message "Invalid choice try again!" ;;
   esac

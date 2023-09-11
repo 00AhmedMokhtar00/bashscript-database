@@ -1,14 +1,22 @@
 #!/bin/bash
 
 # Messages colors
-RED='\033[0;31m' # Make the color of text Red
-GREEN='\e[32m' # Make the color of text Green
-RESET='\033[0m'  # Resets the color to default
+RED='\033[0;31m'  # Make the color of text Red
+GREEN='\e[32m'    # Make the color of text Green
+YELLOW='\033[33m' # Make the color of text Yelloq
+RESET='\033[0m'   # Resets the color to default
 
 important_info_message() {
     local message="$1"
+    local msg_type="$2"
     local min_width=42
     local total_width=$(( ${#message} + 4 ))  # 4 for spaces
+    local COLOR=$YELLOW
+
+    # Check the message type and set the color
+    if [[ $msg_type == "success" ]]; then
+        COLOR=$GREEN
+    fi
 
     # Ensure total_width is at least min_width
     if [[ $total_width -lt $min_width ]]; then
@@ -20,7 +28,7 @@ important_info_message() {
 
     clear
     printf "%-${total_width}s\n" | tr ' ' '-'
-    printf "|%*s${GREEN}%s${RESET}%*s|\n" "$padding_left" "" "$message" "$padding_right" ""
+    printf "|%*s${COLOR}%s${RESET}%*s|\n" "$padding_left" "" "$message" "$padding_right" ""
     printf "%-${total_width}s\n" | tr ' ' '-'
 }
 
@@ -54,6 +62,13 @@ is_valid_name() {
     # Check for an empty name
     if [[ -z $name ]]; then
         error_message "Error: $type name cannot be empty."
+        return 1
+    fi
+
+    # Check the length of the name
+    local length=${#name}
+    if [[ $length -lt 2 || $length -gt 25 ]]; then
+        error_message "Error: $type name must be between 2 and 25 characters in length."
         return 1
     fi
 

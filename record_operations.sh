@@ -13,81 +13,48 @@ create_table() {
   # Prompt for Table Name
   while true; do
     read -p "Enter the name of the table: " table_name
-    table_name=$(trim $table_name)
-    if is_valid_name $table_name "table"; then
+    table_name=$(trim "$table_name")
+    if is_valid_name "$table_name" "table"; then
         break
     fi
   done
 
-
   while true; do
     read -p "Enter the columns (separated by comma): " columns
-
-    valid=true
 
     # Check if user didn't enter anything
     if [[ -z $columns ]]; then
       error_message "Table must contain at least one column!"
-      continue 2
+      continue
     fi
 
-    # remove trailing comma if exists
-    # columns="${columns%,}"
+    IFS=',' read -ra column_array <<< "$columns"
 
-    # Convert columns into an array by separating the columns by commas
-    IFS=',' read -ra column_array <<< $columns
-
-    # Trim spaces from each individual column name
-    for index in "${!column_array[@]}"; do
-      column_array[$index]=$(trim ${column_array[$index]})
-    done
-
-    # Check if column names are valid
-    for col in "${column_array[@]}"; do
-      if is_valid_name $col "column"; then
-          valid=false
-          continue 2
-      fi
-    done
-
-
-    # Check for valid column names and duplicate column names
+    valid=true
     duplicate_check=()
+
     for col in "${column_array[@]}"; do
-      # Check column name validity
-      if [[ ! $col =~ ^[a-zA-Z][a-zA-Z0-9]*$ ]]; then
-        echo "Error: Column name '$col' is invalid. Column names should only contain characters and numbers and should not start with a number."
+      col=$(trim "$col")
+
+      # Check if column names are valid
+      if ! is_valid_name "$col" "column"; then
         valid=false
         break
       fi
 
       # Check for duplicates
-      duplicate_found=false
-      for existing_col in ${duplicate_check[@]}; do
-        if [[ $existing_col == $col ]]; then
-          duplicate_found=true
-          break
-        fi
-      done
-      # if a duplicate found then prompt error message and start over
-      if [[ $duplicate_found == true ]]; then
-        echo "Error: Duplicate column name '$col' detected."
+      if [[ " ${duplicate_check[@]} " =~ " $col " ]]; then
+        error_message "Error: Duplicate column name '$col' detected."
         valid=false
         break
       fi
 
-      # Add the current column name into duplicate_check to ensure that
-      # the user did not repeat it.
-      duplicate_check+=($col)
+      duplicate_check+=("$col")
     done
 
-    # If columns are not valid, restart the loop to prompt for columns again
-    if [[ $valid == false ]]; then
-      continue
+    if [[ $valid == true ]]; then
+      break
     fi
-
-    # If columns are valid, break out of the loop to proceed to next steps
-    break
   done
 
 
@@ -100,7 +67,7 @@ create_table() {
         data_type_array+=($data_type)
         break
       else
-        echo "Error: Invalid data type. Please enter 'int', 'string', or 'date'."
+        error_message "Error: Invalid data type. Please enter 'int', 'string', or 'date'."
       fi
     done
   done
@@ -110,9 +77,16 @@ create_table() {
   # Prompt for Primary Key
   while true; do
     read -p "Enter the primary key column: " primary_key
+
+    # Check for an empty name
+    if [[ -z $primary_key ]]; then
+        error_message "you must specify a primary key!"
+        continue
+    fi
+
     # Check if primary key exists in columns
     if ! [[ " ${column_array[@]} " =~ " ${primary_key} " ]]; then
-      echo "Error: The primary key column does not exist among the provided columns."
+      error_message "The primary key column does not exist among the provided columns."
       continue
     fi
     break
@@ -126,39 +100,27 @@ create_table() {
   # remove trailing white space in the columns line in the table
   sed -i '' '2s/[[:space:]]*$//' ${table_name}.tbl
 
-  echo "Table created."
+  important_info_message "Table created." "success"
 }
 
 # Lists all available .tbl files, which represent the tables in the database.
 list_tables() {
-  echo "Available tables:"
-  echo "------------------"
-  ls *.tbl
-  echo "------------------"
-
-
-  clear
-
   # check if the current dir is empty
   # if yes => view "No tables to list"
-  tables=$(ls -f *.tbl 2>/dev/null)  # Redirecting any errors to /dev/null
+  tables=$(ls *.tbl 2>/dev/null)  # Redirecting any errors to /dev/null
   if [ -z "$tables" ]; then
-    printf "%-33s\n" | tr ' ' '-'
-    echo "|       No tables to show      |"
-    printf "%-33s\n" | tr ' ' '-'
+    error_message "No tables to show"
   else
     # if no => view tables (dirs) available
-    printf "%-33s\n" | tr ' ' '-'
-    echo "|       Available tabels        |"
-    printf "%-33s\n" | tr ' ' '-'
+    important_info_message "Available tables"
     # Looping through tables and displaying them in a formatted manner
     for tb in $tables; do
-      printf "| %-28s  |\n" "${tb%.tb}"
+      printf "| %-38s |\n" "${tb%.tbl}"
     done
-
-    printf "%-33s\n" | tr ' ' '-'
+    printf "%-42s\n" | tr ' ' '-'
   fi
 }
+
 
 # Prompts the user for a table name.
 # Check first:

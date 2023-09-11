@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source database_operations.sh
+source general_functions.sh
 
 main_menu() {
   while true; do
@@ -24,7 +25,7 @@ main_menu() {
       3) connect_to_database ;;
       4) drop_database ;;
       5) exit 0 ;;
-      *) echo "Invalid choice try again!" ;;
+      *) error_message "Invalid choice try again!" ;;
     esac
   done
 }

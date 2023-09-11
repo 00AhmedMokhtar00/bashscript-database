@@ -11,6 +11,7 @@ Mokhtar:
 Tasks for Phase 2 (Implementations for table operations):
 
 Mokhtar:
+    - general_functions.sh
     - Create Table
     - List Tables
 Alaa:

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source record_operations.sh
+source general_functions.sh
 
 table_menu() {
 
@@ -19,7 +20,7 @@ table_menu() {
     read -p "| Enter your choice: " choice
 
     printf "%s\n\n" " -------------------------"
-  
+
 
   # if the user choose (crate table) => create_table() ( record_operations.sh )
   # if the user choose (drop table) => drop_table() ( record_operations.sh )
@@ -33,7 +34,7 @@ table_menu() {
       5) cd ..
       break;;
       6) exit 0 ;;
-      *) echo "Invalid choice try again!" ;;
+      *) error_message "Invalid choice try again!" ;;
     esac
   done
 }
