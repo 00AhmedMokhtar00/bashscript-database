@@ -1,27 +1,17 @@
 #!/bin/bash
 
 source table_operations.sh
+source general_functions.sh
 
 create_database() {
   read -p "Enter the name of the database: " dbname
 
-  # check if the database name  (dir) already exists
+  # check if the database name (dir) already exists
   # if yes => view "Database already exists"
-  if [ -d "$dbname" ]; then
-    clear
-    printf "%-42s\n" | tr ' ' '-'
-    printf "| %-38s |\n" "Database ($dbname) already exists."
-    printf "%-42s\n" | tr ' ' '-'
-    return
-    fi
-
-  # if no => create database dir with the same name
-  # view "Database created successfully"
+  if is_valid_name "$dbname" "database"; then
     mkdir -p $dbname
-    clear
-    printf "%-42s\n" | tr ' ' '-'
-    printf "| %-38s |\n" "Database ($dbname) created successfully."
-    printf "%-42s\n" | tr ' ' '-'
+    important_info_message "Database ($dbname) created successfully." "success"
+  fi
 }
 
 
@@ -29,23 +19,20 @@ list_databases() {
   clear
 
   # check if the main dir is empty
-  # if yes => view "No databases to list"
   dirs=$(ls -d */ 2>/dev/null)  # Redirecting any errors to /dev/null
-  if [ -z "$dirs" ]; then
-    printf "%-33s\n" | tr ' ' '-'
-    echo "|      No databases to show     |"
-    printf "%-33s\n" | tr ' ' '-'
+  if [ -z $dirs ]; then
+    # if yes => view "No databases to list"
+    error_message "No databases to show"
   else
     # if no => view databases (dirs) available
-    printf "%-33s\n" | tr ' ' '-'
-    echo "|      Available databases      |"
-    printf "%-33s\n" | tr ' ' '-'
+    important_info_message "Available databases"
+
     # Looping through directories and displaying them in a formatted manner
     for db in $dirs; do
-      printf "| %-28s  |\n" "${db%/}"
+      printf "| %-38s |\n" "${db%/}"
     done
 
-    printf "%-33s\n" | tr ' ' '-'
+    printf "%-42s\n" | tr ' ' '-'
   fi
 }
 
@@ -53,23 +40,24 @@ list_databases() {
 connect_to_database() {
   read -p "Enter the name of the database: " dbname
 
+  # Check for an empty input
+  if [[ -z $dbname ]]; then
+      error_message "You must provide a database name"
+      return 1
+  fi
+
   # check if the database name (dir) already exists
   # if yes => table_menu() ( table_operations.sh )
   clear
   if [ -d "$dbname" ]; then
-    clear
     cd ./$dbname
-    printf "%-42s\n" | tr ' ' '-'
-    printf "| %-38s |\n" "Connected to database ($dbname)."
-    printf "%-42s\n" | tr ' ' '-'
+    important_info_message "Connected to database ($dbname)." "success"
     table_menu
     return
 
   # if no => view "Database doesn't exist"
   else
-    printf "%-42s\n" | tr ' ' '-'
-    printf "| %-38s |\n" "Database ($dbname) doesn't exist."
-    printf "%-42s\n" | tr ' ' '-'
+    error_message "Database ($dbname) doesn't exist."
   fi
 }
 
@@ -94,18 +82,14 @@ drop_database() {
 
   case $choice in
     1) rm -r $dbname
-        printf "%-42s\n" | tr ' ' '-'
-        printf "| %-38s |\n" "Database ($dbname) dropped successfully."
-        printf "%-42s\n" | tr ' ' '-';;
+        important_info_message "Database ($dbname) dropped successfully." "success";;
     2) return ;;
-    *) echo "Invalid choice try again!" ;;
+    *) error_message "Invalid choice try again!" ;;
   esac
     return
 
   # if no => view "Database dosen't exist"
   else
-  printf "%-42s\n" | tr ' ' '-'
-  printf "| %-38s |\n" "Database ($dbname) dosen't exist."
-  printf "%-42s\n" | tr ' ' '-'
+    error_message "Database ($dbname) dosen't exist."
   fi
 }

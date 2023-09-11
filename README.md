@@ -8,9 +8,10 @@ Mokhtar:
     - Document  (record_operations.sh)
     - Implement (main_menu - create_database - list_databases)
 
-Tasks for Phase 2 (Implementation for table operations):
+Tasks for Phase 2 (Implementations for table operations):
 
 Mokhtar:
+    - general_functions.sh
     - Create Table
     - List Tables
 Alaa:
