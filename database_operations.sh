@@ -64,11 +64,17 @@ connect_to_database() {
 
 drop_database() {
   read -p "Enter the name of the database: " dbname
+  
+  # Check for an empty input
+  if [[ -z $dbname ]]; then
+      error_message "You must provide a database name"
+      return 1
+  fi
 
   # check if the database name  (dir) already exists
   # if yes => view "Are you sure you want to drop database (name)"
-  # if yes => delete database (dir) with the same name
-  # view "Database dropped successfully"
+    # if yes => delete database (dir) with the same name
+    # view "Database dropped successfully"
   clear
   if [ -d "$dbname" ]; then
    clear

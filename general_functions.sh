@@ -3,7 +3,7 @@
 # Messages colors
 RED='\033[0;31m'  # Make the color of text Red
 GREEN='\e[32m'    # Make the color of text Green
-YELLOW='\033[33m' # Make the color of text Yelloq
+YELLOW='\033[33m' # Make the color of text Yellow
 RESET='\033[0m'   # Resets the color to default
 
 important_info_message() {
@@ -52,9 +52,6 @@ error_message() {
 }
 
 
-
-
-
 is_valid_name() {
     local name=$1
     local type=$2  # This should describe the type of entity, e.g., 'database', 'table', 'column', etc.
@@ -99,4 +96,3 @@ trim() {
   # Removes leading and trailing spaces
   echo $1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
 }
-

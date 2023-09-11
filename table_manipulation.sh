@@ -6,7 +6,7 @@ source table_operations.sh
 # Inserts the values into the table.
 # Also checks for the table's existence before proceeding.
 insert_into_table() {
-touch test
+
 }
 
 # Prompts the user for a table name and then displays its content in a formatted manner.
