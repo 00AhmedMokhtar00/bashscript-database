@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source general_functions.sh
+source table_manipulation.sh
 
 create_table() {
   # Prompt for Table Name
@@ -91,7 +91,7 @@ create_table() {
   done
   # remove trailing white space in the columns line in the table
   sed -i '' '2s/[[:space:]]*$//' ${table_name}.tbl
-
+  printf "\n" >> "${table_name}.tbl"
   important_info_message "Table created." "success"
 }
 
@@ -117,7 +117,7 @@ list_tables() {
 drop_table() {
 
   read -p "Enter the name of the Table: " table_name
-  
+
   # Check for an empty input
   if [[ -z $table_name ]]; then
       error_message "You must provide a Table name"
@@ -128,7 +128,7 @@ drop_table() {
   # if yes => view "Are you sure you want to drop Table (name)"
    # if yes => delete table (.tbl file) with the same name
    # view "Table dropped successfully"
-  
+
   clear
   if [ -f "$table_name".tbl ]; then
    clear
@@ -151,7 +151,7 @@ drop_table() {
   # if no => view "Table dosen't exist"
   else
     error_message "Table ($table_name) dosen't exist."
-  fi  
+  fi
 }
 
 
@@ -187,5 +187,5 @@ alter_table() {
       *) error_message "Invalid choice try again!" ;;
     esac
   done
-    
+
 }

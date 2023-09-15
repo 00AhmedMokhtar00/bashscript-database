@@ -1,7 +1,6 @@
 #!/bin/bash
 
 source table_operations.sh
-source general_functions.sh
 
 create_database() {
   read -p "Enter the name of the database: " dbname
@@ -64,7 +63,7 @@ connect_to_database() {
 
 drop_database() {
   read -p "Enter the name of the database: " dbname
-  
+
   # Check for an empty input
   if [[ -z $dbname ]]; then
       error_message "You must provide a database name"

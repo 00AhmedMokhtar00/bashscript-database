@@ -1,7 +1,6 @@
 #!/bin/bash
 
 source record_operations.sh
-source general_functions.sh
 
 table_menu() {
 
