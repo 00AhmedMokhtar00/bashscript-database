@@ -1,6 +1,4 @@
 primary_key:age
 id:int  name:string  age:int
 1,Ahmed,1
-2,dd,2
-4,ff,5
 2,dd,4
