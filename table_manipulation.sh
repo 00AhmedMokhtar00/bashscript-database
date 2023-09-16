@@ -96,6 +96,7 @@ insert_into_table() {
 }
 
 
+
 select_from_table() {
     # Prompt for Table Name
     read -p "Enter the name of the table: " table_name
@@ -103,26 +104,75 @@ select_from_table() {
     # Check if table exists
     table_exists $table_name || return
 
-    # Prompt user for the primary key value of the record they wish to select
-    read -p "Enter the primary key value of the record you wish to select: " primary_value
+    # Extract primary key field from the first line
+    IFS=':' read -r primary_key primary_key_field <<< "$(head -n 1 $table_name.tbl)"
 
-    # Check if the record exists using primary key field
-    if ! grep -q "^$primary_value," $table_name.tbl; then
-        error_message "Record with primary key $primary_value not found."
+    # Extract column names
+    IFS=' ' read -ra fields_data <<< "$(sed -n '2p' $table_name.tbl)"
+    columns=()
+    for field_data in "${fields_data[@]}"; do
+        IFS=':' read -r column _ <<< "$field_data"
+        columns+=("$column")
+    done
+
+    # Find the position of the primary key
+    primary_key_index=-1
+    for index in "${!columns[@]}"; do
+        if [[ "${columns[$index]}" == "$primary_key_field" ]]; then
+            primary_key_index=$index
+            break
+        fi
+    done
+
+    # Prompt user for the primary key value of the record they wish to select
+    read -p "Enter the primary key value of the record you wish to select (leave empty for all records): " primary_value
+
+    # If user provided a primary value
+    if [[ -n "$primary_value" ]]; then
+        primary_key_pattern="^([^,]*,){$primary_key_index}$primary_value(,|$)"
+        matched_row=$(grep -E "$primary_key_pattern" $table_name.tbl)
+        if [[ -z "$matched_row" ]]; then
+            error_message "Record with primary key $primary_value not found."
+            return
+        fi
     else
-        # Extract columns and their data types from the second line
-        IFS=' ' read -ra fitched_columns <<< "$(sed -n '2p' $table_name.tbl)"
-        length=${#fitched_columns[@]}
-        printf "%-40s\n" | tr ' ' '-'
-        for (( i=0; i<$length; i++ )); do
-           x=$((i+1))
-           IFS=' ' read -ra fitched_data <<< "$(grep "^$primary_value," $table_name.tbl | cut -d, -f$x )"
-           data+="$fitched_data"
-           printf "| %-15s %-4s %-15s |\n" "${fitched_columns[$i]}" "|" "$fitched_data"
-           printf "%-40s\n" | tr ' ' '-'
-        done
+        matched_row=$(sed -n '3,$p' $table_name.tbl)  # Get all data rows
     fi
+
+    # Display in table format
+    # Print header row
+    printf "+"
+    for column in "${columns[@]}"; do
+        printf "%-20s+" "$(printf '=%.0s' {1..20})"
+    done
+    printf "\n"
+    printf "|"
+    for column in "${columns[@]}"; do
+        printf " %-18s |" "$column"
+    done
+    printf "\n"
+    printf "+"
+    for column in "${columns[@]}"; do
+        printf "%-20s+" "$(printf '=%.0s' {1..20})"
+    done
+    printf "\n"
+
+    # Display selected rows
+    while IFS= read -r row; do
+        IFS=',' read -ra data <<< "$row"
+        printf "|"
+        for item in "${data[@]}"; do
+            printf " %-18s |" "$item"
+        done
+        printf "\n"
+    done <<< "$matched_row"
+    printf "+"
+    for column in "${columns[@]}"; do
+        printf "%-20s+" "$(printf '=%.0s' {1..20})"
+    done
+    printf "\n"
 }
+
 
 delete_from_table() {
     # Prompt for Table Name
@@ -171,7 +221,6 @@ delete_from_table() {
         fi
     fi
 }
-
 
 
 update_table() {
