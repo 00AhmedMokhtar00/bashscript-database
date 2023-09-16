@@ -3,102 +3,96 @@ source general_functions.sh
 
 insert_into_table() {
     while true; do
-        while true; do
-            # Prompt for Table Name
-            read -p "Enter the name of the table: " table_name
+        # Prompt for Table Name
+        read -p "Enter the name of the table: " table_name
 
-            # Check if table exists
-            if table_exists $table_name; then
-                break
-            fi
-        done
-
-        # Extract primary key from the first line
-        IFS=':' read -r primary_key primary_key_field <<< "$(head -n 1 $table_name.tbl)"
-
-        # Extract columns and their data types from the second line
-        IFS=' ' read -ra fields_data <<< "$(sed -n '2p' $table_name.tbl)"
-
-        columns=()
-        data_types=()
-        for field_data in "${fields_data[@]}"; do
-            IFS=':' read -r column data_type <<< "$field_data"
-            columns+=("$column")
-            data_types+=("$data_type")
-        done
-
-        values=()
-
-        # Prompt user for values for each column and validate
-        for index in "${!columns[@]}"; do
-            while true; do
-                read -p "Enter value for ${columns[$index]} (Type: ${data_types[$index]}): " value
-
-                value=$(trim "$value")
-                # Validate based on data type
-                case "${data_types[$index]}" in
-                    "int")
-                        if ! is_valid_int "$value"; then
-                            error_message "Please enter a valid integer for ${columns[$index]}"
-                            continue
-                        fi
-                        ;;
-                    "string")
-                        if ! is_valid_string "$value"; then
-                            error_message "Please enter a valid string for ${columns[$index]}"
-                            continue
-                        fi
-                        ;;
-                    "date")
-                        if ! is_valid_date "$value"; then
-                            error_message "Please enter a valid date (YYYY-MM-DD) for ${columns[$index]}"
-                            continue
-                        fi
-                        ;;
-                    *)
-                        error_message "Invalid data type for ${columns[$index]}"
-                        return
-                        ;;
-                esac
-
-                values+=("$value")
-                break
-            done
-        done
-
-        # Check primary key uniqueness
-        local is_primary_key_unique=true
-        for i in "${!columns[@]}"; do
-            if [[ "${columns[$i]}" == "$primary_key_field" ]]; then
-                if grep -q "^${values[$i]}" $table_name.tbl; then
-                    error_message "Record with primary key ${values[$i]} already exists."
-                    is_primary_key_unique=false
-                    break
-                fi
-            fi
-        done
-        if ! $is_primary_key_unique;then
-            continue
+        # Check if table exists
+        if table_exists $table_name; then
+            return
         fi
-
-
-        # Construct the string without appending a comma for the last value
-        value_string=""
-        for i in "${!values[@]}"; do
-            if [[ $i -eq $((${#values[@]} - 1)) ]]; then
-                # Last value, don't append comma
-                value_string+="${values[$i]}"
-            else
-                value_string+="${values[$i]},"
-            fi
-        done
-
-        # Append the constructed string to the table
-        echo "$value_string" >> $table_name.tbl
-
-        important_info_message "Record inserted successfully." "success"
-        return
     done
+
+    # Extract primary key from the first line
+    IFS=':' read -r primary_key primary_key_field <<< "$(head -n 1 $table_name.tbl)"
+
+    # Extract columns and their data types from the second line
+    IFS=' ' read -ra fields_data <<< "$(sed -n '2p' $table_name.tbl)"
+
+    columns=()
+    data_types=()
+    for field_data in "${fields_data[@]}"; do
+        IFS=':' read -r column data_type <<< "$field_data"
+        columns+=("$column")
+        data_types+=("$data_type")
+    done
+
+    values=()
+
+    # Prompt user for values for each column and validate
+    for index in "${!columns[@]}"; do
+        while true; do
+            read -p "Enter value for ${columns[$index]} (Type: ${data_types[$index]}): " value
+
+            value=$(trim "$value")
+            # Validate based on data type
+            case "${data_types[$index]}" in
+                "int")
+                    if ! is_valid_int "$value"; then
+                        error_message "Please enter a valid integer for ${columns[$index]}"
+                        continue
+                    fi
+                    ;;
+                "string")
+                    if ! is_valid_string "$value"; then
+                        error_message "Please enter a valid string for ${columns[$index]}"
+                        continue
+                    fi
+                    ;;
+                "date")
+                    if ! is_valid_date "$value"; then
+                        error_message "Please enter a valid date (YYYY-MM-DD) for ${columns[$index]}"
+                        continue
+                    fi
+                    ;;
+                *)
+                    error_message "Invalid data type for ${columns[$index]}"
+                    return
+                    ;;
+            esac
+
+            values+=("$value")
+            break
+        done
+    done
+
+    # Check primary key uniqueness
+    for i in "${!columns[@]}"; do
+        if [[ "${columns[$i]}" == "$primary_key_field" ]]; then
+            # The grep command match only the primary key column using the ^ and , delimiters
+            primary_key_pattern="^([^,]*,){$i}${values[$i]}(,|$)"
+            if grep -qE "$primary_key_pattern" $table_name.tbl; then
+                error_message "Record with primary key ${values[$i]} already exists."
+                return
+            fi
+        fi
+    done
+
+
+    # Construct the string without appending a comma for the last value
+    value_string=""
+    for i in "${!values[@]}"; do
+        if [[ $i -eq $((${#values[@]} - 1)) ]]; then
+            # Last value, don't append comma
+            value_string+="${values[$i]}"
+        else
+            value_string+="${values[$i]},"
+        fi
+    done
+
+    # Append the constructed string to the table
+    echo "$value_string" >> $table_name.tbl
+
+    important_info_message "Record inserted successfully." "success"
 }
 
 
@@ -108,7 +102,7 @@ select_from_table() {
 
     # Check if table exists
     table_exists $table_name || return
-     
+
     # Prompt user for the primary key value of the record they wish to select
     read -p "Enter the primary key value of the record you wish to select: " primary_value
 
@@ -126,12 +120,12 @@ select_from_table() {
            data+="$fitched_data"
            printf "| %-15s %-4s %-15s |\n" "${fitched_columns[$i]}" "|" "$fitched_data"
            printf "%-40s\n" | tr ' ' '-'
-        done   
-    fi  
+        done
+    fi
 }
 
 
-delete_from_table() { 
+delete_from_table() {
     # Prompt for Table Name
     read -p "Enter the name of the table: " table_name
 
@@ -139,8 +133,8 @@ delete_from_table() {
     table_exists $table_name || return
 
     # Extract primary key field from the first line
-    IFS=':' read -r primary_key primary_key_field <<< "$(head -n 1 $table_name.tbl)"    
-    
+    IFS=':' read -r primary_key primary_key_field <<< "$(head -n 1 $table_name.tbl)"
+
     # Prompt user for the primary key value of the record they wish to delete
     read -p "Enter the primary key value of the record you wish to delete: " primary_value
 
@@ -175,16 +169,26 @@ update_table() {
         data_types+=("$data_type")
     done
 
+    # Find the position of the primary key
+    primary_key_index=-1
+    for index in "${!columns[@]}"; do
+        if [[ "${columns[$index]}" == "$primary_key_field" ]]; then
+            primary_key_index=$index
+            break
+        fi
+    done
+
     # Prompt user for the primary key value of the record they wish to update
     read -p "Enter the primary key value of the record you wish to update: " primary_value
 
-    # Check if the record exists using primary key field
-    if ! grep -q "^$primary_value," $table_name.tbl; then
+    # Adjust the grep command to match only the primary key column
+    primary_key_pattern="^([^,]*,){$primary_key_index}$primary_value(,|$)"
+    if ! grep -qE "$primary_key_pattern" $table_name.tbl; then
         error_message "Record with primary key $primary_value not found."
         return
     fi
 
-    # Prompt user for column to update and new value
+    # Prompt user for column to update
     echo "Available columns: ${columns[*]}"
     read -p "Enter the column you want to update: " update_column
 
@@ -206,8 +210,9 @@ update_table() {
 
     # Check if user is trying to update the primary key column
     if [[ "$update_column" == "$primary_key_field" ]]; then
-        # Check if the new primary key value already exists in the table
-        if grep -q "^$new_value," $table_name.tbl; then
+        # Adjust the grep command to match only the primary key column
+        new_primary_key_pattern="^([^,]*,){$primary_key_index}$new_value(,|$)"
+        if grep -qE "$new_primary_key_pattern" $table_name.tbl; then
             error_message "Error: duplicate key value violates unique constraint $table_name pkey"
             return
         fi
@@ -241,31 +246,38 @@ update_table() {
 
     # Use awk to update the record and save it atomically
     temp_file="${table_name}_$(date +%s%N).tmp"
-    awk -F, -v col="$update_column" -v val="$new_value" -v key="$primary_value" -v fields="${columns[*]}" '
-        BEGIN {
-            # Convert fields to an array
-            split(fields, arr, " ")
-            for(i in arr) {
-                if(arr[i] == col) {
-                    idx = i
-                    break
+    awk -F, -v col_idx="$update_column_index" -v val="$new_value" -v key="$primary_value" -v pk_idx="$primary_key_index" '
+        {
+            # For the first two lines (metadata), simply print them as they are
+            if (NR <= 2) {
+                print $0;
+                next;
+            }
+
+            split($0, line, ",")
+            # If updating the primary key column
+            if (col_idx == pk_idx) {
+                if (line[pk_idx + 1] == key) {
+                    line[col_idx + 1] = val
                 }
             }
-        }
-        {
-            # Update the specific field of the matching record
-            if($1 == key) {
-                split($0, line, ",")
-                line[idx] = val
-                $0 = line[1]
-                for(i=2; i<=length(line); i++) {
-                    $0 = $0 "," line[i]
+            # If updating a column other than the primary key column
+            else {
+                if (line[pk_idx + 1] == key) {
+                    line[col_idx + 1] = val
                 }
+            }
+            $0 = ""
+            for(i=1; i<=length(line); i++) {
+                if (i > 1) {
+                    $0 = $0 ","
+                }
+                $0 = $0 line[i]
             }
             print $0
         }
     ' $table_name.tbl > $temp_file && mv $temp_file $table_name.tbl
 
+
     important_info_message "Record updated successfully." "success"
 }
-
