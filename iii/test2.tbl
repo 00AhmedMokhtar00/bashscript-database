@@ -1,5 +1,0 @@
-primary_key:id
-id:int name:string age:int 
-1,ww,33
-2,ww,22
-3,uu,77

@@ -1,7 +1,0 @@
-primary_key:id
-id:int name:string age:int date:date 
-1,aa,99,1999-01-01
-4,dd,44,1999-01-01
-5,ee,55,1999-01-01
-7,gg,66,1999-01-01
-8,hh,88,1999-01-01
