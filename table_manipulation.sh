@@ -124,30 +124,6 @@ select_from_table() {
     fi
 }
 
-
-# delete_from_table() {
-#     # Prompt for Table Name
-#     read -p "Enter the name of the table: " table_name
-
-#     # Check if table exists
-#     table_exists $table_name || return
-
-#     # Extract primary key field from the first line
-#     IFS=':' read -r primary_key primary_key_field <<< "$(head -n 1 $table_name.tbl)"
-
-#     # Prompt user for the primary key value of the record they wish to delete
-#     read -p "Enter the primary key value of the record you wish to delete: " primary_value
-
-#     # Check if the record exists using primary key field
-#     if ! grep -q "^$primary_value," $table_name.tbl; then
-#         error_message "Record with primary key $primary_value not found."
-#         return
-#     else
-#        sed -i /^"$primary_value"/d  $table_name.tbl
-#        important_info_message "Record deleted successfully." "success"
-#     fi
-# }
-
 delete_from_table() {
     # Prompt for Table Name
     read -p "Enter the name of the table: " table_name
@@ -294,7 +270,7 @@ update_table() {
     esac
 
     # Use awk to update the record and save it atomically
-    temp_file="${table_name}_$(date +%s%N).tmp"
+    temp_file="${table_name}_$(date +%s%N)"
     awk -F, -v col_idx="$update_column_index" -v val="$new_value" -v key="$primary_value" -v pk_idx="$primary_key_index" '
         {
             # For the first two lines (metadata), simply print them as they are
