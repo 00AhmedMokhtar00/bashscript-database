@@ -212,7 +212,7 @@ is_valid_date() {
 }
 
 
-is_table_exists(){
+table_exists(){
     local table_name=$1
 
     # Check for an empty table name

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source table_operations.sh
+source table_menu.sh
 
 create_database() {
   read -p "Enter the name of the database: " dbname
