@@ -70,7 +70,7 @@ insert_into_table() {
         local is_primary_key_unique=true
         for i in "${!columns[@]}"; do
             if [[ "${columns[$i]}" == "$primary_key_field" ]]; then
-                if grep -q "${values[$i]}" $table_name.tbl; then
+                if grep -q "^${values[$i]}" $table_name.tbl; then
                     error_message "Record with primary key ${values[$i]} already exists."
                     is_primary_key_unique=false
                     break
@@ -149,7 +149,7 @@ delete_from_table() {
         error_message "Record with primary key $primary_value not found."
         return
     else
-       sed -i /"$primary_value"/d  $table_name.tbl
+       sed -i /^"$primary_value"/d  $table_name.tbl
        important_info_message "Record deleted successfully." "success"
     fi
 }
