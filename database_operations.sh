@@ -77,11 +77,11 @@ drop_database() {
   clear
   if [ -d "$dbname" ]; then
    clear
-   printf "\n%s\n" " ------------------------------------------------- "
-   printf "| %-45s  |\n" "Are you sure you want to drop database ($dbname)?"
-   printf "| %-45s  |\n" "1. Yes"
-   printf "| %-45s  |\n" "2. No"
-   printf "%s\n" " ------------------------------------------------- "
+   printf "\n%s\n" " ----------------------------------------------------- "
+   printf "| %-50s  |\n" "Are you sure you want to drop database ($dbname)?"
+   printf "| %-50s  |\n" "1. Yes"
+   printf "| %-50s  |\n" "2. No"
+   printf "%s\n" " ----------------------------------------------------- "
 
   read -p "| Enter your choice: " choice
 

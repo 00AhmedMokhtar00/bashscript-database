@@ -1,7 +1,6 @@
 #!/bin/bash
 
 source database_operations.sh
-source general_functions.sh
 
 main_menu() {
   while true; do

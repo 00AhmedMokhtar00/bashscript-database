@@ -132,11 +132,11 @@ drop_table() {
   clear
   if [ -f "$table_name".tbl ]; then
    clear
-   printf "\n%s\n" " ------------------------------------------------- "
-   printf "| %-45s  |\n" "Are you sure you want to drop Table ($table_name)?"
-   printf "| %-45s  |\n" "1. Yes"
-   printf "| %-45s  |\n" "2. No"
-   printf "%s\n" " ------------------------------------------------- "
+   printf "\n%s\n" " ----------------------------------------------------- "
+   printf "| %-50s  |\n" "Are you sure you want to drop database ($table_name)?"
+   printf "| %-50s  |\n" "1. Yes"
+   printf "| %-50s  |\n" "2. No"
+   printf "%s\n" " ----------------------------------------------------- "
 
   read -p "| Enter your choice: " choice
 

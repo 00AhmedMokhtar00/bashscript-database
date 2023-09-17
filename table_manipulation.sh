@@ -2,15 +2,13 @@
 source general_functions.sh
 
 insert_into_table() {
-    while true; do
         # Prompt for Table Name
         read -p "Enter the name of the table: " table_name
 
         # Check if table exists
-        if table_exists $table_name; then
+        if ! table_exists $table_name; then
             return
         fi
-    done
 
     # Extract primary key from the first line
     IFS=':' read -r primary_key primary_key_field <<< "$(head -n 1 $table_name.tbl)"
@@ -124,20 +122,37 @@ select_from_table() {
         fi
     done
 
-    # Prompt user for the primary key value of the record they wish to select
-    read -p "Enter the primary key value of the record you wish to select (leave empty for all records): " primary_value
+
+   clear
+   printf "\n%s\n" " ----------------------------------------------------- "
+   printf "| %-50s  |\n" "Select"
+   printf "| %-50s  |\n" "1. All"
+   printf "| %-50s  |\n" "2. Tuple"
+   printf "%s\n" " ----------------------------------------------------- "
+
+  read -p "| Enter your choice: " choice
+
+  case $choice in
+    1) matched_row=$(sed -n '3,$p' $table_name.tbl)  # Get all data rows
+    ;;
+    2)read -p "Enter the primary key value of the record you wish to select: " primary_value
 
     # If user provided a primary value
-    if [[ -n "$primary_value" ]]; then
+    if [[ -z "$primary_value" ]]; then
+        error_message "Error: primary key value cannot be empty."
+        return
+    else
         primary_key_pattern="^([^,]*,){$primary_key_index}$primary_value(,|$)"
         matched_row=$(grep -E "$primary_key_pattern" $table_name.tbl)
         if [[ -z "$matched_row" ]]; then
             error_message "Record with primary key $primary_value not found."
             return
-        fi
-    else
-        matched_row=$(sed -n '3,$p' $table_name.tbl)  # Get all data rows
-    fi
+        fi  
+    fi ;;
+    *) error_message "Invalid choice try again!" ;;
+  esac
+
+    
 
     # Display in table format
     # Print header row
